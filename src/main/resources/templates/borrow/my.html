@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('我的借用')}"></head>
+<body>
+<div th:replace="~{fragments :: topbar}"></div>
+<div class="app-shell">
+    <div th:replace="~{fragments :: sidebar('my-borrows')}"></div>
+    <main class="content">
+        <div class="mb-4">
+            <h1 class="h3 mb-1">我的借用</h1>
+            <p class="text-muted mb-0">查看本人借用申请、审核状态和归还情况。</p>
+        </div>
+        <section class="page-card">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>设备</th>
+                        <th>数量</th>
+                        <th>申请时间</th>
+                        <th>借出时间</th>
+                        <th>预计归还</th>
+                        <th>实际归还</th>
+                        <th>状态</th>
+                        <th>备注</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="record : ${records}">
+                        <td th:text="${record.id}">1</td>
+                        <td th:text="${record.equipment.equipmentName}">设备</td>
+                        <td th:text="${record.borrowQuantity}">1</td>
+                        <td th:text="${#temporals.format(record.createTime, 'yyyy-MM-dd HH:mm')}">2026-06-12</td>
+                        <td th:text="${record.borrowTime == null ? '-' : #temporals.format(record.borrowTime, 'yyyy-MM-dd HH:mm')}">-</td>
+                        <td th:text="${record.expectedReturnTime}">2026-06-20</td>
+                        <td th:text="${record.actualReturnTime == null ? '-' : #temporals.format(record.actualReturnTime, 'yyyy-MM-dd HH:mm')}">-</td>
+                        <td th:text="${record.status.label}">待审核</td>
+                        <td th:text="${record.remark}">备注</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(records)}">
+                        <td colspan="9" class="text-center text-muted">暂无借用记录</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

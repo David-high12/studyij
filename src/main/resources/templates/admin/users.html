@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('用户管理')}"></head>
+<body>
+<div th:replace="~{fragments :: topbar}"></div>
+<div class="app-shell">
+    <div th:replace="~{fragments :: sidebar('users')}"></div>
+    <main class="content">
+        <div class="mb-4">
+            <h1 class="h3 mb-1">用户管理</h1>
+            <p class="text-muted mb-0">维护管理员和普通用户账号。</p>
+        </div>
+        <div th:replace="~{fragments :: alerts}"></div>
+
+        <section class="page-card mb-4">
+            <form class="row g-3 align-items-end" th:action="@{/admin/users}" method="get">
+                <div class="col-md-4">
+                    <label class="form-label" for="keyword">用户名或姓名</label>
+                    <input class="form-control" id="keyword" name="keyword" th:value="${keyword}">
+                </div>
+                <div class="col-md-8 form-actions">
+                    <a class="btn btn-outline-secondary" th:href="@{/admin/users}">清空</a>
+                    <button class="btn btn-primary" type="submit">查询</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="page-card mb-4">
+            <h2 class="h5 mb-3" th:text="${formUser.id == null ? '新增用户' : '修改用户'}">新增用户</h2>
+            <form class="row g-3" th:action="@{/admin/users/save}" th:object="${formUser}" method="post">
+                <input type="hidden" th:field="*{id}">
+                <div class="col-md-3">
+                    <label class="form-label">用户名</label>
+                    <input class="form-control" th:field="*{username}" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">密码</label>
+                    <input class="form-control" name="rawPassword" type="password" th:placeholder="${formUser.id == null ? '默认 123456' : '留空则不修改'}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">真实姓名</label>
+                    <input class="form-control" th:field="*{realName}" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">手机号</label>
+                    <input class="form-control" th:field="*{phone}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">角色</label>
+                    <select class="form-select" th:field="*{role}">
+                        <option th:each="role : ${roles}" th:value="${role}" th:text="${role.label}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">状态</label>
+                    <select class="form-select" th:field="*{status}">
+                        <option th:each="status : ${statuses}" th:value="${status}" th:text="${status.label}"></option>
+                    </select>
+                </div>
+                <div class="col-md-6 form-actions">
+                    <a class="btn btn-outline-secondary" th:href="@{/admin/users}">新建</a>
+                    <button class="btn btn-primary" type="submit">保存用户</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="page-card">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>用户名</th>
+                        <th>真实姓名</th>
+                        <th>角色</th>
+                        <th>手机号</th>
+                        <th>状态</th>
+                        <th>创建时间</th>
+                        <th class="text-end">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="user : ${users}">
+                        <td th:text="${user.id}">1</td>
+                        <td th:text="${user.username}">admin</td>
+                        <td th:text="${user.realName}">系统管理员</td>
+                        <td th:text="${user.role.label}">管理员</td>
+                        <td th:text="${user.phone}">13800000000</td>
+                        <td><span class="badge text-bg-success" th:text="${user.status.label}">启用</span></td>
+                        <td th:text="${#temporals.format(user.createTime, 'yyyy-MM-dd HH:mm')}">2026-06-12</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-primary" th:href="@{/admin/users(editId=${user.id})}">修改</a>
+                            <form class="d-inline" th:action="@{/admin/users/{id}/reset(id=${user.id})}" method="post">
+                                <button class="btn btn-sm btn-outline-secondary" type="submit">重置密码</button>
+                            </form>
+                            <form class="d-inline" th:action="@{/admin/users/{id}/delete(id=${user.id})}" method="post">
+                                <button class="btn btn-sm btn-outline-danger" type="submit" onclick="return confirm('确认删除该用户？')">删除</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(users)}">
+                        <td colspan="8" class="text-center text-muted">暂无用户数据</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

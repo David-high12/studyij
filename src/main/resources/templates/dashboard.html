@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('主控制面板')}"></head>
+<body>
+<div th:replace="~{fragments :: topbar}"></div>
+<div class="app-shell">
+    <div th:replace="~{fragments :: sidebar('dashboard')}"></div>
+    <main class="content">
+        <div class="alert alert-warning" th:if="${forbidden}">当前账号没有访问该模块的权限。</div>
+        <div class="mb-4">
+            <h1 class="h3 mb-1">主控制面板</h1>
+            <p class="text-muted mb-0">按角色展示可操作模块和关键数据。</p>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="metric">
+                    <div class="text-muted">用户数量</div>
+                    <div class="value" th:text="${userCount}">0</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric">
+                    <div class="text-muted">设备分类</div>
+                    <div class="value" th:text="${categoryCount}">0</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric">
+                    <div class="text-muted">设备总数</div>
+                    <div class="value" th:text="${equipmentCount}">0</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric">
+                    <div class="text-muted">待审核申请</div>
+                    <div class="value" th:text="${pendingCount}">0</div>
+                </div>
+            </div>
+        </div>
+        <section class="page-card mt-4">
+            <h2 class="h5 mb-3">常用入口</h2>
+            <div class="d-flex flex-wrap gap-2" th:if="${session.loginRole.name() == 'ADMIN'}">
+                <a class="btn btn-primary" th:href="@{/admin/equipment}">设备信息管理</a>
+                <a class="btn btn-outline-primary" th:href="@{/admin/borrows}">借用审核</a>
+                <a class="btn btn-outline-primary" th:href="@{/admin/logs}">操作日志</a>
+                <a class="btn btn-outline-secondary" th:href="@{/admin/export/equipment}">导出设备信息</a>
+            </div>
+            <div class="d-flex flex-wrap gap-2" th:if="${session.loginRole.name() == 'USER'}">
+                <a class="btn btn-primary" th:href="@{/equipment}">查询可借设备</a>
+                <a class="btn btn-outline-primary" th:href="@{/my/borrows}">查看我的借用</a>
+                <a class="btn btn-outline-secondary" th:href="@{/profile/password}">修改密码</a>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

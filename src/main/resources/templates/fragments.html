@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' - 高校实验室设备库存与借用管理系统'">高校实验室设备库存与借用管理系统</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary" th:fragment="topbar">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-semibold" th:href="@{/dashboard}">实验室设备管理系统</a>
+        <div class="d-flex align-items-center gap-3 text-white">
+            <span th:text="${session.loginRealName}">当前用户</span>
+            <a class="btn btn-outline-light btn-sm" th:href="@{/logout}">退出登录</a>
+        </div>
+    </div>
+</nav>
+
+<aside class="sidebar" th:fragment="sidebar(active)">
+    <a th:href="@{/dashboard}" th:classappend="${active == 'dashboard'} ? 'active'">主控制面板</a>
+    <th:block th:if="${session.loginRole != null and session.loginRole.name() == 'ADMIN'}">
+        <a th:href="@{/admin/users}" th:classappend="${active == 'users'} ? 'active'">用户管理</a>
+        <a th:href="@{/admin/categories}" th:classappend="${active == 'categories'} ? 'active'">设备分类管理</a>
+        <a th:href="@{/admin/equipment}" th:classappend="${active == 'equipment-admin'} ? 'active'">设备信息管理</a>
+        <a th:href="@{/admin/borrows}" th:classappend="${active == 'borrows-admin'} ? 'active'">借用管理</a>
+        <a th:href="@{/admin/logs}" th:classappend="${active == 'logs'} ? 'active'">操作日志</a>
+        <a th:href="@{/admin/export/equipment}">设备信息导出</a>
+    </th:block>
+    <th:block th:if="${session.loginRole != null and session.loginRole.name() == 'USER'}">
+        <a th:href="@{/equipment}" th:classappend="${active == 'equipment-user'} ? 'active'">设备查询</a>
+        <a th:href="@{/my/borrows}" th:classappend="${active == 'my-borrows'} ? 'active'">我的借用</a>
+    </th:block>
+    <a th:href="@{/profile/password}" th:classappend="${active == 'password'} ? 'active'">修改密码</a>
+</aside>
+
+<div th:fragment="alerts">
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('借用管理')}"></head>
+<body>
+<div th:replace="~{fragments :: topbar}"></div>
+<div class="app-shell">
+    <div th:replace="~{fragments :: sidebar('borrows-admin')}"></div>
+    <main class="content">
+        <div class="mb-4">
+            <h1 class="h3 mb-1">借用管理</h1>
+            <p class="text-muted mb-0">审核借用申请并办理归还。</p>
+        </div>
+        <div th:replace="~{fragments :: alerts}"></div>
+
+        <section class="page-card mb-4">
+            <form class="row g-3 align-items-end" th:action="@{/admin/borrows}" method="get">
+                <div class="col-md-4">
+                    <label class="form-label">借用状态</label>
+                    <select class="form-select" name="status">
+                        <option value="">全部状态</option>
+                        <option th:each="item : ${statuses}" th:value="${item}" th:selected="${item == status}" th:text="${item.label}"></option>
+                    </select>
+                </div>
+                <div class="col-md-8 form-actions">
+                    <a class="btn btn-outline-secondary" th:href="@{/admin/borrows}">清空</a>
+                    <button class="btn btn-primary" type="submit">查询</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="page-card">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>申请人</th>
+                        <th>设备</th>
+                        <th>数量</th>
+                        <th>预计归还</th>
+                        <th>借出时间</th>
+                        <th>实际归还</th>
+                        <th>状态</th>
+                        <th>备注</th>
+                        <th class="text-end">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="record : ${records}">
+                        <td th:text="${record.id}">1</td>
+                        <td th:text="${record.user.realName}">学生用户</td>
+                        <td th:text="${record.equipment.equipmentName}">设备</td>
+                        <td th:text="${record.borrowQuantity}">1</td>
+                        <td th:text="${record.expectedReturnTime}">2026-06-20</td>
+                        <td th:text="${record.borrowTime == null ? '-' : #temporals.format(record.borrowTime, 'yyyy-MM-dd HH:mm')}">-</td>
+                        <td th:text="${record.actualReturnTime == null ? '-' : #temporals.format(record.actualReturnTime, 'yyyy-MM-dd HH:mm')}">-</td>
+                        <td th:text="${record.status.label}">待审核</td>
+                        <td th:text="${record.remark}">备注</td>
+                        <td class="text-end">
+                            <form class="d-inline" th:if="${record.status.name() == 'PENDING'}" th:action="@{/admin/borrows/{id}/approve(id=${record.id})}" method="post">
+                                <button class="btn btn-sm btn-outline-success" type="submit">通过</button>
+                            </form>
+                            <form class="d-inline" th:if="${record.status.name() == 'PENDING'}" th:action="@{/admin/borrows/{id}/reject(id=${record.id})}" method="post">
+                                <button class="btn btn-sm btn-outline-danger" type="submit">拒绝</button>
+                            </form>
+                            <form class="d-inline" th:if="${record.status.name() == 'BORROWED'}" th:action="@{/admin/borrows/{id}/return(id=${record.id})}" method="post">
+                                <button class="btn btn-sm btn-outline-primary" type="submit">归还</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(records)}">
+                        <td colspan="10" class="text-center text-muted">暂无借用记录</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

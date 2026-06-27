@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('设备分类管理')}"></head>
+<body>
+<div th:replace="~{fragments :: topbar}"></div>
+<div class="app-shell">
+    <div th:replace="~{fragments :: sidebar('categories')}"></div>
+    <main class="content">
+        <div class="mb-4">
+            <h1 class="h3 mb-1">设备分类管理</h1>
+            <p class="text-muted mb-0">维护实验室设备分类。</p>
+        </div>
+        <div th:replace="~{fragments :: alerts}"></div>
+
+        <section class="page-card mb-4">
+            <form class="row g-3 align-items-end" th:action="@{/admin/categories}" method="get">
+                <div class="col-md-4">
+                    <label class="form-label" for="keyword">分类名称</label>
+                    <input class="form-control" id="keyword" name="keyword" th:value="${keyword}">
+                </div>
+                <div class="col-md-8 form-actions">
+                    <a class="btn btn-outline-secondary" th:href="@{/admin/categories}">清空</a>
+                    <button class="btn btn-primary" type="submit">查询</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="page-card mb-4">
+            <h2 class="h5 mb-3" th:text="${formCategory.id == null ? '新增分类' : '修改分类'}">新增分类</h2>
+            <form class="row g-3" th:action="@{/admin/categories/save}" th:object="${formCategory}" method="post">
+                <input type="hidden" th:field="*{id}">
+                <div class="col-md-4">
+                    <label class="form-label">分类名称</label>
+                    <input class="form-control" th:field="*{categoryName}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">分类描述</label>
+                    <input class="form-control" th:field="*{description}">
+                </div>
+                <div class="col-md-2 form-actions">
+                    <button class="btn btn-primary" type="submit">保存分类</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="page-card">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>分类名称</th>
+                        <th>分类描述</th>
+                        <th>创建时间</th>
+                        <th class="text-end">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="category : ${categories}">
+                        <td th:text="${category.id}">1</td>
+                        <td th:text="${category.categoryName}">计算机设备</td>
+                        <td th:text="${category.description}">描述</td>
+                        <td th:text="${#temporals.format(category.createTime, 'yyyy-MM-dd HH:mm')}">2026-06-12</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-primary" th:href="@{/admin/categories(editId=${category.id})}">修改</a>
+                            <form class="d-inline" th:action="@{/admin/categories/{id}/delete(id=${category.id})}" method="post">
+                                <button class="btn btn-sm btn-outline-danger" type="submit" onclick="return confirm('确认删除该分类？')">删除</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(categories)}">
+                        <td colspan="5" class="text-center text-muted">暂无分类数据</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

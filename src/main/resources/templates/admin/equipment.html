@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('设备信息管理')}"></head>
+<body>
+<div th:replace="~{fragments :: topbar}"></div>
+<div class="app-shell">
+    <div th:replace="~{fragments :: sidebar('equipment-admin')}"></div>
+    <main class="content">
+        <div class="mb-4">
+            <h1 class="h3 mb-1">设备信息管理</h1>
+            <p class="text-muted mb-0">维护设备编号、分类、库存和状态。</p>
+        </div>
+        <div th:replace="~{fragments :: alerts}"></div>
+
+        <section class="page-card mb-4">
+            <form class="row g-3 align-items-end" th:action="@{/admin/equipment}" method="get">
+                <div class="col-md-3">
+                    <label class="form-label">设备名称或编号</label>
+                    <input class="form-control" name="keyword" th:value="${keyword}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">分类</label>
+                    <select class="form-select" name="categoryId">
+                        <option value="">全部分类</option>
+                        <option th:each="category : ${categories}" th:value="${category.id}" th:selected="${category.id == categoryId}" th:text="${category.categoryName}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">状态</label>
+                    <select class="form-select" name="status">
+                        <option value="">全部状态</option>
+                        <option th:each="item : ${statuses}" th:value="${item}" th:selected="${item == status}" th:text="${item.label}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3 form-actions">
+                    <a class="btn btn-outline-secondary" th:href="@{/admin/equipment}">清空</a>
+                    <button class="btn btn-primary" type="submit">查询</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="page-card mb-4">
+            <h2 class="h5 mb-3" th:text="${formEquipment.id == null ? '新增设备' : '修改设备'}">新增设备</h2>
+            <form class="row g-3" th:action="@{/admin/equipment/save}" th:object="${formEquipment}" method="post">
+                <input type="hidden" th:field="*{id}">
+                <div class="col-md-3">
+                    <label class="form-label">设备名称</label>
+                    <input class="form-control" th:field="*{equipmentName}" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">设备编号</label>
+                    <input class="form-control" th:field="*{equipmentCode}" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">分类</label>
+                    <select class="form-select" name="categoryId" required>
+                        <option value="">请选择分类</option>
+                        <option th:each="category : ${categories}" th:value="${category.id}" th:selected="${category.id == formCategoryId}" th:text="${category.categoryName}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">型号</label>
+                    <input class="form-control" th:field="*{model}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">总数量</label>
+                    <input class="form-control" th:field="*{totalQuantity}" type="number" min="1" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">可借数量</label>
+                    <input class="form-control" th:field="*{availableQuantity}" type="number" min="0" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">状态</label>
+                    <select class="form-select" th:field="*{status}">
+                        <option th:each="item : ${statuses}" th:value="${item}" th:text="${item.label}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">存放位置</label>
+                    <input class="form-control" th:field="*{location}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">备注</label>
+                    <input class="form-control" th:field="*{remark}">
+                </div>
+                <div class="col-12 form-actions">
+                    <a class="btn btn-outline-secondary" th:href="@{/admin/equipment}">新建</a>
+                    <button class="btn btn-primary" type="submit">保存设备</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="page-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h5 mb-0">设备列表</h2>
+                <a class="btn btn-outline-success btn-sm" th:href="@{/admin/export/equipment}">导出 Excel</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>名称</th>
+                        <th>分类</th>
+                        <th>型号</th>
+                        <th>库存</th>
+                        <th>状态</th>
+                        <th>位置</th>
+                        <th class="text-end">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="equipment : ${equipmentList}">
+                        <td th:text="${equipment.equipmentCode}">EQ-001</td>
+                        <td th:text="${equipment.equipmentName}">实验笔记本</td>
+                        <td th:text="${equipment.category.categoryName}">计算机设备</td>
+                        <td th:text="${equipment.model}">型号</td>
+                        <td><span th:text="${equipment.availableQuantity}">0</span>/<span th:text="${equipment.totalQuantity}">0</span></td>
+                        <td th:text="${equipment.status.label}">可借用</td>
+                        <td th:text="${equipment.location}">A101</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-primary" th:href="@{/admin/equipment(editId=${equipment.id})}">修改</a>
+                            <form class="d-inline" th:action="@{/admin/equipment/{id}/delete(id=${equipment.id})}" method="post">
+                                <button class="btn btn-sm btn-outline-danger" type="submit" onclick="return confirm('确认删除该设备？')">删除</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(equipmentList)}">
+                        <td colspan="8" class="text-center text-muted">暂无设备数据</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>
